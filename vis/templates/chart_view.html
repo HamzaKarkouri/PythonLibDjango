@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <title>Clickable Squares</title>
+</head>
+
+<style>
+  .center-container {
+      text-align: center;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+  }
+</style>
+
+<body>
+
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#"></a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNavDropdown">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="{% url 'index' %}">Acceuil</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'process_csv' %}">CSV</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="">Profil</a>
+          </li>
+          <!-- <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Dropdown link
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+              <li><a class="dropdown-item" href="#">Action</a></li>
+              <li><a class="dropdown-item" href="#">Another action</a></li>
+              <li><a class="dropdown-item" href="#">Something else here</a></li>
+            </ul>
+          </li> -->
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h2>Simple Form</h2>
+
+
+    <form method="post" action="{% url 'show' %}" class="form">
+        {% csrf_token %}
+        
+     
+        <div class="form-group row">
+          <div class="col-sm">
+          <label for="dropdown1">Csv File</label>
+          <select class="form-control" id="dropdown1" name="dropdown1">
+              {% for uploaded_file in uploaded_files %}
+                  <option value="{{ uploaded_file.file.name }}">{{ uploaded_file.file.name }}</option>
+              {% endfor %}
+          </select>
+        </div>
+          {% if lendata %}
+          <div class="col-sm">
+              <input id="selected" name="selected" value="{{selected}}"/>
+              <label for="column1">Column 1</label>
+              <select class="form-control" id="dropdown2" name="dropdown2">
+                  {% for col in datahtml %}
+                      <option value="{{ col }}">{{ col }}</option>
+                  {% endfor %}
+              </select>
+      
+              <label for="column2">Column 2</label>
+              <select class="form-control" id="dropdown3" name="dropdown3">
+                  {% for col in datahtml  %}
+                      <option value="{{ col}}">{{ col }}</option>
+                  {% endfor %}
+              </select>
+            </div>
+            <div class="col-sm">
+              <label for="numRowsInput">Select Rows:</label>
+                
+              <input type="number" class="form-control" id="numRowsInput" min="1" value="{{lendata}}">
+                 
+            </div>
+  
+        
+      </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+        {% endif %}
+
+    </form>
+  </div>
+
+  <div class="center-container">
+    <h1>Charts</h1>
+    <!-- Your chart content goes here -->
+    <div>
+      {% if image %}
+      <img src="data:image/png;base64,{{ image }}" alt="{{selected}}">
+    {% endif %}
+    </div>
+</div>
+
+  <div style="float: right; margin-right: 60px;margin-top:5%">
+    <form method="post" action="{% url 'show' %}">
+      {% csrf_token %}
+        <select name="selected_chart">
+            {% if selected %}
+            <option selected >{{ selected }}</option>
+            {% endif %}
+
+            {% for key, value in charts.items %}
+                {% if value != selected %}
+                  <option value="{{ key }}">{{ value }}</option>
+                {% endif %}
+            {% endfor %}
+        </select>
+        <button type="submit">Submit</button>
+    </form>
+</div>
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" integrity="sha384-e0qVgIBUqDk+uU6dxwLlk5i5ek2o2w5xq5J0GBn5A6lAvcXm" crossorigin="anonymous"></script>
+</body>
+</html>

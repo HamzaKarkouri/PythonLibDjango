@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    />
+    <title>Clickable Squares</title>
+  </head>
+
+  <body>
+    <style>
+      .square {
+        width: 250px;
+        height: 250px;
+        background-color: #007bff;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        cursor: pointer;
+      }
+
+      .centered-div {
+        margin-left: 30%;
+      }
+
+      .square:hover {
+        background-color: #0056b3;
+      }
+
+      .center-text {
+        /* Center vertically and horizontally */
+        position: absolute;
+        top: 50%;
+        left: auto;
+        margin: -25px 0 0 -25px;
+      }
+    </style>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#"></a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNavDropdown"
+          aria-controls="navbarNavDropdown"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="#"
+                >Acceuil</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'process_csv' %}">CSV</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="">Profil</a>
+            </li>
+            <!-- <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Dropdown link
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+              <li><a class="dropdown-item" href="#">Action</a></li>
+              <li><a class="dropdown-item" href="#">Another action</a></li>
+              <li><a class="dropdown-item" href="#">Something else here</a></li>
+            </ul>
+          </li> -->
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="row">
+      <div
+        class="col-md-4"
+        style="background-color: #e0e0e0; height: 100vh; width: 300px"
+      >
+        <div class="col-sm m-2">
+          {% if lendata %}
+          <form method="post" action="{% url 'list_files' %}" class="form">
+            {% csrf_token %}
+            <h3 style="margin-top: 40px">Slicing</h3>
+            <input
+              name="dropdown1"
+              id="dropdown1"
+              value="{{selected}}"
+              hidden
+            />
+            <label for="dropdown2">Columns</label>
+            {% for column in columns %}
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                name="selected_columns"
+                value="{{ column }}"
+                id="{{ column }}"
+              />
+              <label class="form-check-label" for="{{ column }}">
+                {{ column }}
+              </label>
+            </div>
+            {% endfor %}
+
+            <br />
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="radio"
+                name="slice_option"
+                value="head"
+                id="head"
+              />
+              <label class="form-check-label" for="head">Head</label>
+            </div>
+
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="radio"
+                name="slice_option"
+                value="tail"
+                id="tail"
+              />
+              <label class="form-check-label" for="tail">Tail</label>
+            </div>
+
+            <div class="row">
+              <div class="col-sm">
+                <label for="line1">Select From:</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  name="line1"
+                  id="line1"
+                  min="0"
+                  placeholder="0"
+                  value="0"
+                />
+              </div>
+              <div class="col-sm">
+                <label for="line2"
+                  >Select To:<span
+                    style="color: rgb(243, 76, 76); font-size: 10px"
+                    >({{lendata}})</span
+                  ></label
+                >
+                <input
+                  type="number"
+                  class="form-control"
+                  name="line2"
+                  id="line2"
+                  min="0"
+                  placeholder="0"
+                  value="0"
+                />
+              </div>
+            </div>
+
+            <br />
+
+            <div class="row">
+              <div class="col-sm">
+                <label for="sample">Select Sample:</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  name="sample"
+                  id="sample"
+                  min="0"
+                  placeholder="0"
+                  value="0"
+                />
+              </div>
+            </div>
+            <h3 style="margin-top: 40px">Group by</h3>
+            <div class="col-sm">
+              <label for="group">Group by</label>
+              <select class="form-control" id="group" name="group">
+                {% for col in columns %}
+                <option value="{{ col }}">{{ col }}</option>
+                {% endfor %}
+              </select>
+              <label for="dropdown2">Columns</label>
+              {% for column in columns %}
+              <div class="form-check2">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  name="selected_columns2"
+                  value="{{ column }}"
+                  id="{{ column }}"
+                />
+                <label class="form-check-label" for="{{ column }}">
+                  {{ column }}
+                </label>
+              </div>
+              {% endfor %}
+              <br />
+              <label for="agg">Aggregations</label><br />
+              <select class="form-control" id="agg" name="agg">
+                {% for col in agg %}
+                <option value="{{ col }}">{{ col }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <button
+              style="margin-top: 40px"
+              type="submit"
+              class="btn btn-primary"
+            >
+              Submit
+            </button>
+            {% endif %}
+          </form>
+        </div>
+      </div>
+      <div class="col-md-7 container">
+        <h2>Simple Form</h2>
+        <form method="post" action="{% url 'list_files' %}" class="form">
+          {% csrf_token %}
+
+          <div class="form-group row">
+            <div class="col-sm">
+              <label for="dropdown1">Csv File</label>
+              <select class="form-control" id="dropdown1" name="dropdown1">
+                {% for uploaded_file in uploaded_files %}
+                <option value="{{ uploaded_file.file.name }}">
+                  {{ uploaded_file.file.name }}
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+
+            {% if lendata %}
+
+            <div class="col-sm">
+              <div class="pagination">
+                <div class="form-group">
+                  {% csrf_token %}
+                  <label for="numRowsInput">Select Rows:</label>
+                  <div class="row">
+                    <div class="col-sm">
+                      <input
+                        type="number"
+                        class="form-control"
+                        id="numRowsInput"
+                        min="1"
+                        value="10"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {% endif %}
+          </div>
+
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+        <div class="container">
+          <!-- Main content (table) -->
+          <div class="col-md-1">
+            <table class="table" id="data-table">
+              <thead>
+                <tr>
+                  {% for column in datahtml %}
+                  <th>{{ column }}</th>
+                  {% endfor %}
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in datahtml.values %}
+                <tr>
+                  {% for v in row %}
+                  <td>{{ v }}</td>
+                  {% endfor %}
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Side div with gray background -->
+
+      <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-e0qVgIBUqDk+uU6dxwLlk5i5ek2o2w5xq5J0GBn5A6lAvcXm"
+        crossorigin="anonymous"
+      ></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+      <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+      <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+      <script>
+        $(document).ready(function () {
+          $(".dropdown-item").click(function () {
+            var csrf_token = "{{ csrf_token }}";
+            var selectedFilename = $(this).data("filename");
+
+            // Send the selected filename to the server using AJAX
+            $.ajax({
+              type: "POST",
+              url: '{% url "list_files" %}', // Replace with your server endpoint
+              data: { filename: selectedFilename },
+              headers: { "X-CSRFToken": csrf_token },
+              success: function (data) {
+                // Handle success if needed
+                console.log(
+                  "Selected filename sent to the server successfully."
+                );
+              },
+              error: function (error) {
+                // Handle error if needed
+                console.error(
+                  "Error sending selected filename to the server:",
+                  error
+                );
+              },
+            });
+          });
+        });
+      </script>
+
+      <script>
+        $(document).ready(function () {
+          $("#numRowsInput").val(10);
+
+          $("#numRowsInput").on("change", function () {
+            var selectedValue = $("#numRowsInput").val();
+            var numRowsToShow =
+              selectedValue === "all"
+                ? data.values.length
+                : parseInt(selectedValue);
+
+            // Hide all rows first
+            $("#data-table tbody tr").hide();
+
+            // Show the selected number of rows
+            $("#data-table tbody tr:lt(" + numRowsToShow + ")").show();
+          });
+        });
+      </script>
+
+      <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-e0qVgIBUqDk+uU6dxwLlk5i5ek2o2w5xq5J0GBn5A6lAvcXm"
+        crossorigin="anonymous"
+      ></script>
+    </div>
+  </body>
+</html>

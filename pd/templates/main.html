@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block title %}Other Page{% endblock %}
+
+  
+{% block content %}
+<style>
+  
+ 
+
+
+    .square {
+      width: 250px;
+      height: 250px;
+      background-color: #007bff;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      cursor: pointer;
+    }
+
+    .centered-div {
+ 
+   margin-left: 30%;
+ 
+    }
+
+    .square:hover {
+      background-color: #0056b3;
+    }
+
+    .center-text {
+        /* Center vertically and horizontally */
+      position: absolute;
+      top: 50%;
+      left: auto;
+      margin: -25px 0 0 -25px;
+    }
+    
+  </style>
+<div class="container mt-5  centered-div">
+  <div class="row "  >
+    <div class="col-md-3">
+      <a href="page1.html" class="text-decoration-none">
+        <div class="card text-white bg-primary mb-3 square">
+          <div class="card-body center-text">
+            <h5 class="card-title">Pandas</h5>
+          </div>
+        </div>
+      </a>
+    </div>
+    <div class="col-md-3">
+      <a href="{% url 'show' %}" class="text-decoration-none">
+        <div class="card text-white bg-success mb-3 square">
+          <div class="card-body center-text">
+            <h5 class="card-title">Visualisation</h5>
+          </div>
+        </div>
+      </a>
+    </div>
+  </div>
+  <div class="row ">
+    <div class="col-md-3">
+      <a href="page3.html" class="text-decoration-none">
+        <div class="card text-white bg-warning mb-3 square" >
+          <div class="card-body center-text">
+            <h5 class="card-title">Probabilite</h5>
+          </div>
+        </div>
+      </a>
+    </div>
+    <div class="col-md-3">
+      <a href="page4.html" class="text-decoration-none">
+        <div class="card text-white bg-danger mb-3 square">
+          <div class="card-body center-text">
+            <h5 class="card-title">Python</h5>
+          </div>
+        </div>
+      </a>
+    </div>
+  </div>
+  
+</div>
+{% endblock %}
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" integrity="sha384-e0qVgIBUqDk+uU6dxwLlk5i5ek2o2w5xq5J0GBn5A6lAvcXm" crossorigin="anonymous"></script>
+</body>
+</html>

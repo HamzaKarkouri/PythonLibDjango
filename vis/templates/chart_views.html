@@ -9,6 +9,7 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    margin-top: 30px
   }
 </style>
 
@@ -21,9 +22,23 @@
       {% if lendata %}
       <form method="post" action="{% url 'show' %}" class="form">
         {% csrf_token %}
+
+
+        <input name="dropdown1" id="dropdown1" value="{{selected}}" hidden />
+          <label for="selected_chart">Charts:</label><br>
+
+        <select name="selected_chart" id="selected_chart">
+          
+          {% for key, value in charts.items %} 
+            {% if value != selected %}
+          <option value="{{ key }}">{{ value }}</option>
+            {% endif %} 
+          {% endfor %}
+        </select>
+
         <h3 style="margin-top: 40px">Slicing</h3>
         <input name="dropdown1" id="dropdown1" value="{{selected}}" hidden />
-        <label for="dropdown2">Columns</label>
+        
         {% for column in columns %}
         <div class="form-check">
           <input
@@ -40,106 +55,7 @@
         {% endfor %}
 
         <br />
-        <div class="form-check">
-          <input
-            class="form-check-input"
-            type="radio"
-            name="slice_option"
-            value="head"
-            id="head"
-          />
-          <label class="form-check-label" for="head">Head</label>
-        </div>
-
-        <div class="form-check">
-          <input
-            class="form-check-input"
-            type="radio"
-            name="slice_option"
-            value="tail"
-            id="tail"
-          />
-          <label class="form-check-label" for="tail">Tail</label>
-        </div>
-
-        <div class="row">
-          <div class="col-sm">
-            <label for="line1">Select From:</label>
-            <input
-              type="number"
-              class="form-control"
-              name="line1"
-              id="line1"
-              min="0"
-              placeholder="0"
-              value="0"
-            />
-          </div>
-          <div class="col-sm">
-            <label for="line2"
-              >Select To:<span style="color: rgb(243, 76, 76); font-size: 10px"
-                >({{lendata}})</span
-              ></label
-            >
-            <input
-              type="number"
-              class="form-control"
-              name="line2"
-              id="line2"
-              min="0"
-              placeholder="0"
-              value="0"
-            />
-          </div>
-        </div>
-
-        <br />
-
-        <div class="row">
-          <div class="col-sm">
-            <label for="sample">Select Sample:</label>
-            <input
-              type="number"
-              class="form-control"
-              name="sample"
-              id="sample"
-              min="0"
-              placeholder="0"
-              value="0"
-            />
-          </div>
-        </div>
-        <h3 style="margin-top: 40px">Group by</h3>
-        <div class="col-sm">
-          <label for="group">Group by</label>
-          <select class="form-control" id="group" name="group">
-            {% for col in columns %}
-            <option value="{{ col }}">{{ col }}</option>
-            {% endfor %}
-          </select>
-          <label for="dropdown2">Columns</label>
-          {% for column in columns %}
-          <div class="form-check2">
-            <input
-              class="form-check-input"
-              type="checkbox"
-              name="selected_columns2"
-              value="{{ column }}"
-              id="{{ column }}"
-            />
-            <label class="form-check-label" for="{{ column }}">
-              {{ column }}
-            </label>
-          </div>
-          {% endfor %}
-          <br />
-          <label for="agg">Aggregations</label><br />
-          <select class="form-control" id="agg" name="agg">
-            {% for col in agg %}
-            <option value="{{ col }}">{{ col }}</option>
-            {% endfor %}
-          </select>
-        </div>
+       
 
         <button style="margin-top: 40px" type="submit" class="btn btn-primary">
           Submit
@@ -153,7 +69,7 @@
     <form method="post" action="{% url 'show' %}" class="form">
       {% csrf_token %}
 
-      <div class="form-group row">
+      <div class="form-group row" style="margin-bottom: 5px;">
         <div class="col-sm">
 
           <label for="dropdown1">Csv File</label>
@@ -166,29 +82,7 @@
           </select>
         </div>
 
-        {% if lendata %}
-
-        <div class="col-sm">
-          <div class="pagination">
-            <div class="form-group">
-              {% csrf_token %}
-              <label for="numRowsInput">Select Rows:</label>
-              <div class="row">
-                <div class="col-sm">
-                  <input
-                    type="number"
-                    class="form-control"
-                    id="numRowsInput"
-                    min="1"
-                    value="10"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {% endif %}
+      
       </div>
 
       <button type="submit" class="btn btn-primary">Submit</button>
@@ -203,26 +97,7 @@
       </div>
     </div>
 
-    <div style="float: right; margin-right: 60px; margin-top: 5%">
-      <form method="post" action="{% url 'show' %}">
-
-        {% csrf_token %}
-        <input name="dropdown1" id="dropdown1" value="{{selected}}" hidden />
-
-        <select name="selected_chart">
-          {% if selected %}
-          <option selected>{{ selected }}</option>
-          {% endif %} 
-          
-          {% for key, value in charts.items %} 
-            {% if value != selected %}
-          <option value="{{ key }}">{{ value }}</option>
-            {% endif %} 
-          {% endfor %}
-        </select>
-        <button type="submit">Submit</button>
-      </form>
-    </div>
+  
   </div>
 </div>
 

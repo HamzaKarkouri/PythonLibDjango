@@ -81,35 +81,25 @@ def show(request):
         
         selected_chart_key = request.POST.get('selected_chart')
         print(selected_chart_key)
-        choix1 = request.POST.get('choix1')
-        print(choix1)
-        choix2 = request.POST.get('choix2')
-        print(choix2)
-
-
-        filename = request.POST.get('dropdown1')
-        print("here"+request.POST.get('dropdown1'))
-        # filename = filename.split("uploaded_csv/")[1]
-
-        # Filter UploadedFile objects based on the file name
-        uploaded_files = UploadedFile.objects.filter(file__contains=filename)
-        if selected_chart_key:
-            context['selected'] = charts[selected_chart_key]
-
-        print(uploaded_files)
-        
+          # Accessing selected columns
+        print("hello")
+        selected_columns = request.POST.getlist('selected_columns')
+        print('Selected Columns:', selected_columns)
+        if selected_columns:
+            if selected_columns != 'all':
+                context['datahtml'] = df[selected_columns]
+        df = context['datahtml']
         if selected_chart_key == 'Line_Plot':
             print(selected_chart_key)
             
-         
-            df = pd.DataFrame(uploaded_files)
-            df[choix1] = pd.to_datetime(df[choix1])
+            print(pd.api.types.is_datetime64_any_dtype(df[selected_columns[0]]))
+            # df[selected_columns[0]] = pd.to_datetime(df[selected_columns[0]])
 
             sns.set()
             fig, ax = plt.subplots(figsize=(10, 6))
-            sns.lineplot(x=choix1, y=choix2, data=df, marker='o', color='b', label=choix2, ax=ax)
-            ax.set_xlabel(choix1)
-            ax.set_ylabel(choix2)
+            sns.lineplot(x=selected_columns[0], y=selected_columns[1], data=df, marker='o', color='b', label=selected_columns[1], ax=ax)
+            ax.set_xlabel(selected_columns[0])
+            ax.set_ylabel(selected_columns[1])
             ax.set_title('Line Plot')
             ax.legend()
 
@@ -127,14 +117,15 @@ def show(request):
         if selected_chart_key == 'Scatter_Plot':
             print(selected_chart_key)
 
-            diamonds = sns.load_dataset('diamonds')
-            diamonds = diamonds[
-            diamonds.cut.isin(['Premium', 'Good']) &
-            diamonds.color.isin(['D', 'F', 'J'])
-            ].sample(n=100, random_state=22)
-            diamonds.shape 
-            sns.scatterplot(x='carat', y='price', data=diamonds)
-            plt.title('Scatter Plot of Carat vs. Price')
+            # diamonds = sns.load_dataset('diamonds')
+            # diamonds = diamonds[
+            # diamonds.cut.isin(['Premium', 'Good']) &
+            # diamonds.color.isin(['D', 'F', 'J'])
+            # ].sample(n=100, random_state=22)
+            # diamonds.shape 
+
+            sns.scatterplot(x=selected_columns[0], y=selected_columns[1], data=df)
+            plt.title('Scatter Plot')
             buffer = BytesIO()
             plt.savefig(buffer, format='png')
             buffer.seek(0)
@@ -148,15 +139,13 @@ def show(request):
         if selected_chart_key == 'box_plot':
             print(selected_chart_key)
 
-            cars = sns.load_dataset('mpg').dropna()
             fig, axes = plt.subplots(1, 3, figsize=(15, 5))
-            sns.boxplot(cars.mpg, ax=axes[0])
-            axes[0].set_title('Box Plot - Overall MPG')
-            sns.boxplot(x=cars.origin, y=cars.mpg, ax=axes[1])
-            axes[1].set_title('Box Plot - MPG by Origin')
-            sns.boxplot(x='origin', y='mpg', hue='cylinders', data=cars, ax=axes[2])
-            axes[2].set_title('Box Plot - MPG by Origin and Cylinders')
-            plt.tight_layout()
+            sns.boxplot(selected_columns[0], ax=axes[0])
+            axes[0].set_title('Box Plot - '+selected_columns[0])
+            sns.boxplot(x=df[selected_columns[0]], y=df[selected_columns[1]], ax=axes[1])
+            axes[1].set_title('Box Plot -'+selected_columns[1])
+            sns.boxplot(x=selected_columns[0], y=selected_columns[1], data=df, ax=axes[2])
+            axes[2].set_title('Box Plot -'+selected_columns[0]+" "+selected_columns[1])
 
             # Save the plot to a BytesIO object
             buffer = BytesIO()
@@ -171,19 +160,18 @@ def show(request):
 
         if selected_chart_key == 'Histogram':
 
-            penguins = sns.load_dataset('penguins')
-            penguins.dropna(inplace=True)
+            
 
             # Create a figure with subplots
             fig, axes = plt.subplots(2, 2, figsize=(12, 8))
 
             # Histogram for bill length
-            sns.histplot(penguins.bill_length_mm, ax=axes[0, 0])
-            axes[0, 0].set_title('Histogram - Bill Length')
+            sns.histplot(df[selected_columns[0]], ax=axes[0, 0])
+            axes[0, 0].set_title('Histogram -'+selected_columns[0])
 
             # Histogram for bill length by species
-            sns.histplot(x='bill_length_mm', data=penguins, hue='species', ax=axes[0, 1])
-            axes[0, 1].set_title('Histogram by Species - Bill Length')
+            sns.histplot(x=selected_columns[0], data=df, ax=axes[0, 1])
+            axes[0, 1].set_title('Histogram -'+selected_columns[0])
 
             # Generate a random grayscale image
             X = np.random.randint(0, 256, size=(50, 50))
@@ -209,6 +197,39 @@ def show(request):
             # Encode the image as base64
             graph = base64.b64encode(image_png).decode()
             context['image'] = graph
+        if selected_chart_key == 'Kde_Plot':
+            sns.set(style="whitegrid")
+            plt.figure(figsize=(10, 6))
+            sns.histplot(x=selected_columns[0], data=df, kde=True)
+            plt.title(selected_columns[0])
+
+            # Save the plot to a BytesIO object
+            buffer = BytesIO()
+            plt.savefig(buffer, format='png')
+            buffer.seek(0)
+            image_png = buffer.getvalue()
+            buffer.close()
+
+            # Encode the image as base64
+            graph = base64.b64encode(image_png).decode()
+
+            # Pass the base64-encoded image to the template context
+            context['image'] = graph
+
+        if selected_chart_key == 'Heatmap':
+            sns.set()
+            plt.figure(figsize=(10, 8))
+            sns.heatmap(df.corr(), annot=True, cmap='coolwarm', fmt='.2f')
+            print("hello")
+            # Save the plot to a BytesIO object
+            buffer = BytesIO()
+            plt.savefig(buffer, format='png')
+            buffer.seek(0)
+            image_png = buffer.getvalue()
+            buffer.close()
+
+            # Encode the image as base64
+            heatmap_image = base64.b64encode(image_png).decode()
 
 
         context['lendata'] = len(context['datahtml'])

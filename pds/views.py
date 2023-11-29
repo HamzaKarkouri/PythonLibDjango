@@ -65,18 +65,23 @@ def list_uploaded_files(request):
         line2_value = int(request.POST.get('line2', 0))
 
         if line2_value == 0 and line1_value != 0:
-            context['datahtml'] = context['datahtml'].iloc[line1_value]
+            print(line1_value)
+            print(context['datahtml'].loc[line1_value])
+
+            context['datahtml'] = context['datahtml'].loc[[line1_value]]
         elif line2_value != 0 and line1_value != 0:
-            context['datahtml'] = context['datahtml'].iloc[line1_value:line2_value]
+            context['datahtml'] = context['datahtml'].loc[line1_value:line2_value]
      
 
 
         print('Line 1 Value:', line1_value)
         print('Line 2 Value:', line2_value)
 
-        # Accessing sample input
         sample_value = int(request.POST.get('sample', 0))
+        if sample_value:
+           context['datahtml']= context['datahtml'].sample(n=sample_value)
         print('Sample Value:', sample_value)
+
 
         # Accessing group by select and selected columns
         group_by_column = request.POST.get('group', '')
@@ -104,5 +109,8 @@ def list_uploaded_files(request):
                 context['datahtml'] = context['datahtml'].groupby(group_by_column)[group_by_selected_columns].count()
 
         context['lendata'] = len(context['datahtml'])
+        print(context['datahtml'])
+        print("heeeeeeeere")
+        print(context['datahtml'].transpose())
     return render(request, 'list_files.html', context)
 
